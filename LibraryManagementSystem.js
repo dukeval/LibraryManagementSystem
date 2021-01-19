@@ -10,7 +10,7 @@ class LibraryManagement{
 
        this.BookInventory.forEach(books =>{
         if(books.Book.Title == book.Title){
-            books.BookCount +=1;
+            books.Copies +=1;
             found = true;
         }
        });
@@ -25,10 +25,10 @@ class LibraryManagement{
     CheckBookOut(book,user){
         this.BookInventory.forEach(books =>{
          if(books.Book.Title == book.Title){             
-             if(books.BookCount>0)
+             if(books.Copies>0)
              {
                 this.CheckedOutBooks.push(new CheckOut(book, user));
-                books.BookCount -=1;             
+                books.Copies -=1;             
             }
          }
         });
@@ -47,7 +47,11 @@ class LibraryUser{
     }
 
     CreateNewLibraryCard(){
-        this.CardId = Math.floor(Date.now() / 1000);
+        this.CardId = new Date().getTime();//Math.floor(Date.now() / 1000);
+    }
+
+    GetLibraryCardId(){
+        return this.CardId;
     }
 }
 
@@ -136,7 +140,7 @@ class Author{
 class BranchInventory{
     constructor(book){
         this.Book = book;
-        this.BookCount = 1;
+        this.Copies = 1;
     }
 }
 
@@ -179,7 +183,7 @@ class Branch extends LibraryManagement{
     IsBookAvailableForCheckOut(book){
         let found = false
         this.BookInventory.forEach(bookInfo=> {
-            if( bookInfo.Book.Title == book.Title && bookInfo.BookCount>0)
+            if( bookInfo.Book.Title == book.Title && bookInfo.Copies>0)
             {
                 found= true;               
             }
@@ -193,7 +197,7 @@ class Branch extends LibraryManagement{
         if(this.IsBookAvailableForCheckOut(book))
         {
             this.CheckBookOut(book,user);
-            console.log(`You have checked out ${book.Title}.  This book is due back in 7 days!!  Thank you for using ${this.BranchName} library.  Happy Reading!`);
+            console.log(`Good News, ${user.Name}!  You have checked out ${book.Title}.  This book is due back in 7 days!!  Thank you for using ${this.BranchName} library.  Happy Reading!`);
             
         }
         else{
@@ -277,31 +281,55 @@ class Publisher{
 
 
 //Test Run
+
+//Branch Setup
 const eastBranches = new Branch("East Branch","123 Main St.","Sunday - Friday 8AM - 5 PM");
 const westBranches = new Branch("West Branch","123 AppleTree St.","Sunday - Friday 8AM - 4 PM");
+
+//User Setup
 const user = new LibraryUser("John Doe", "111 Main st.");
 const user2 = new LibraryUser("Jane Doe", "111 Main st.");
-user.CreateNewLibraryCard();
-user2.CreateNewLibraryCard();
 
-const bookToSearch =new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("No Starch Press","12/4/2018",""),1593279509);
-const book2ToSearch =new Book("Javascript: Definitive Guide", new Author("David Flanagan", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("O'Reilly Media","6/9/2020",""),1491952024);
-const book3ToSearch =new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("No Starch Press","12/4/2018",""),1593279509);
+user.CreateNewLibraryCard();
+console.log(`User 1 card ID is: ${user.GetLibraryCardId()}`);
+user2.CreateNewLibraryCard();
+console.log(`User 2 card ID is: ${user2.GetLibraryCardId()}`);
+
+//Book List
+const listOfBooks = [
+    new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("No Starch Press","12/4/2018",""),1593279509),
+    new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("No Starch Press","12/4/2018",""),1593279509),
+    new Book("Javascript: Definitive Guide", new Author("David Flanagan", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("O'Reilly Media","6/9/2020",""),1491952024),
+    new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("No Starch Press","12/4/2018",""),1593279509),
+
+    new Book("What The Dog Saw and Other Adventures", new Author("Malcolm Gladwell", "Lorem Epsum"),new Genre("Psychology"),new Publisher("Back Bay Books","5/4/2010",""),9780316076203),
+    new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("No Starch Press","12/4/2018",""),1593279509),
+    new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("No Starch Press","12/4/2018",""),1593279509),
+    new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("No Starch Press","12/4/2018",""),1593279509),
+    new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("No Starch Press","12/4/2018",""),1593279509),
+];
 
 const failedBookToSearch =new Book("DodgeBall Fundementals", new Author("Luke Broock", "Lorem Epsum"),new Genre("Gaming"),new Publisher("ESPN Media",'5/4/1998',''));
 
+//Add book to Branch
+eastBranches.AddBookToLibrary(listOfBooks[0]);
+eastBranches.AddBookToLibrary(listOfBooks[1]);
+eastBranches.AddBookToLibrary(listOfBooks[2]);
+eastBranches.AddBookToLibrary(listOfBooks[3]);
 
-eastBranches.AddBookToLibrary(new Book("Javascript: Definitive Guide", new Author("David Flanagan", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("O'Reilly Media","6/9/2020",""),1491952024));
-eastBranches.AddBookToLibrary(new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("No Starch Press","12/4/2018",""),1593279509));
-eastBranches.AddBookToLibrary(new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("No Starch Press","12/4/2018",""),1593279509));
-eastBranches.AddBookToLibrary(new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("No Starch Press","12/4/2018",""),1593279509));
+westBranches.AddBookToLibrary(listOfBooks[4]);
+westBranches.AddBookToLibrary(listOfBooks[5]);
+westBranches.AddBookToLibrary(listOfBooks[6]);
+westBranches.AddBookToLibrary(listOfBooks[7]);
 
-
-eastBranches.CheckOutBookFromBranch(bookToSearch,user);
-eastBranches.CheckOutBookFromBranch(book2ToSearch,user);
-eastBranches.CheckOutBookFromBranch(book3ToSearch,user2);
-
+//Check out from Branch
+eastBranches.CheckOutBookFromBranch(listOfBooks[0],user);
+eastBranches.CheckOutBookFromBranch(listOfBooks[2],user);
+eastBranches.CheckOutBookFromBranch(listOfBooks[1],user2);
 eastBranches.CheckOutBookFromBranch(failedBookToSearch,user2);
 
+westBranches.CheckOutBookFromBranch(listOfBooks[4],user2);
+
+//Print user's checked out books from Branch.
 eastBranches.UsersStatus(user);
-eastBranches.UsersStatus(user2);
+westBranches.UsersStatus(user2);
