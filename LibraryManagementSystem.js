@@ -1,4 +1,3 @@
-
 class LibraryManagement{  
     constructor(){
         this.BookInventory = [];
@@ -41,12 +40,18 @@ class LibraryManagement{
 }
 
 class LibraryUser{
-    constructor(userName, userAddress){
-        this.Name = userName;
-        this.Address = userAddress;
+    constructor(){
+        this.Name = "";
+        this.Address = "";
     }
 
-    CreateNewLibraryCard(){
+    GetName(){
+        return this.Name;
+    }
+
+    RegisterNewUser(userName, address){
+        this.Name = userName;
+        this.Address = address;
         this.CardId = new Date().getTime();//Math.floor(Date.now() / 1000);
     }
 
@@ -112,7 +117,6 @@ class Book{
     }
 }
 
-
 class Author{
     constructor(name,bio){
         this.Name = name;
@@ -136,14 +140,12 @@ class Author{
     }
 }
 
-
 class BranchInventory{
     constructor(book){
         this.Book = book;
         this.Copies = 1;
     }
 }
-
 
 class Branch extends LibraryManagement{
     constructor(name, location, hoursOfOperation){
@@ -197,18 +199,18 @@ class Branch extends LibraryManagement{
         if(this.IsBookAvailableForCheckOut(book))
         {
             this.CheckBookOut(book,user);
-            console.log(`Good News, ${user.Name}!  You have checked out ${book.Title}.  This book is due back in 7 days!!  Thank you for using ${this.BranchName} library.  Happy Reading!`);
+            console.log(`Good News, ${user.GetName()}!  You have checked out ${book.GetTitle()}.  This book is due back in 7 days!!  Thank you for using ${this.GetBranchName()} library.  Happy Reading!`);
             
         }
         else{
-            const notfoundMessage = `Sorry the book you requested, ${book.Title} , is not available.  
+            const notfoundMessage = `Sorry the book you requested, ${book.GetTitle()} , is not available.  
             Please check back in 7 days for availability status.  
             You may like these other book in that Genre. `;
 
             let referenceBooks="";
             this.BookInventory.forEach(element=> {
-                             if(element.Book.BookGenre.GenreType == book.BookGenre.GenreType && element.Book.Title != book.Title){ 
-                                referenceBooks = `${referenceBooks}, ${element.Book.Title}`;
+                             if(element.Book.BookGenre.GetBookGenre() == book.BookGenre.GetBookGenre() && element.Book.GetTitle() != book.GetTitle()){ 
+                                referenceBooks = `${referenceBooks}, ${element.Book.GetTitle()}`;
                              }
                         });
             
@@ -220,15 +222,14 @@ class Branch extends LibraryManagement{
     UsersStatus(user){
         this.CheckedOutBooks.forEach(element=>{
             if(element.User == user){
-                console.log(`Hello ${user.Name}, you have the following book checked out: ${
-                    element.Book.Title
+                console.log(`Hello ${user.GetName()}, you have the following book checked out: ${
+                    element.Book.GetTitle()
                 }`);
                 
             }
         });
     }
 }
-
 
 class Genre{
     constructor(genre){
@@ -243,7 +244,6 @@ class Genre{
         this.GenreType = newGenre;
     }
 }
-
 
 class Publisher{
     constructor(companyName, datePublished, copyright){
@@ -281,18 +281,17 @@ class Publisher{
 
 
 //Test Run
-
 //Branch Setup
 const eastBranches = new Branch("East Branch","123 Main St.","Sunday - Friday 8AM - 5 PM");
 const westBranches = new Branch("West Branch","123 AppleTree St.","Sunday - Friday 8AM - 4 PM");
 
 //User Setup
-const user = new LibraryUser("John Doe", "111 Main st.");
-const user2 = new LibraryUser("Jane Doe", "111 Main st.");
+const user = new LibraryUser();
+const user2 = new LibraryUser();
 
-user.CreateNewLibraryCard();
+user.RegisterNewUser("John Doe", "111 Main st.");
 console.log(`User 1 card ID is: ${user.GetLibraryCardId()}`);
-user2.CreateNewLibraryCard();
+user2.RegisterNewUser("Jane Doe", "111 Main st.");
 console.log(`User 2 card ID is: ${user2.GetLibraryCardId()}`);
 
 //Book List
