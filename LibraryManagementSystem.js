@@ -1,98 +1,10 @@
-class Book{
-    constructor(title,authorInfo, genre, publisherInfo, isbn){
-        this.Title = title;
-        this.Author = authorInfo;
-        this.BookGenre = genre;
-        this.Publication = publisherInfo;
-        this.ISBN = isbn;
-    }
 
-    getTitle(){
-        return this.Title;
-    }
-
-    setTitle(bookTitle){
-        this.Title = bookTitle;
-    }
-
-    getAuthor(){
-        return this.Author;
-    }
-
-    setAuthor(newAuthor){
-        this.Author = newAuthor;
-    }
-
-    getBookGenre(){
-        return this.BookGenre;
-    }
-
-    setBookGenre(genre){
-        this.BookGenre = genre;
-    }
-
-    getPublication(){
-        return this.Publication;
-    }
-
-    setPublication(newPublication){
-        this.Publication = newPublication;
-    }
-   
-
-    getISBN(){
-        return this.ISBN;
-    }
-
-    setISBN(newISBN){
-        this.ISBN = newISBN;
-    }
-}
-
-
-class Author{
-    constructor(name,bio){
-        this.Name = name;
-        this.Bio = bio;
-    }
-
-    getName(){
-        return this.Name;
-    }
-
-    setName(authorName){
-        this.Name = authorName;
-    }
-
-    getBio(){
-        return this.Bio;
-    }
-
-    setBio(details){
-        this.Bio = details;
-    }
-}
-
-
-class BranchInventory{
-    constructor(book){
-        this.Book = book;
-        this.BookCount = 1;
-    }
-}
-
-
-class Branch{
-    constructor(name, location, hoursOfOperation){
-        this.BranchName = name;
-        this.Location = location;
-        this.HoursOfOperation = hoursOfOperation;
+class LibraryManagement{  
+    constructor(){
         this.BookInventory = [];
+        this.CheckedOutBooks = [];
     }
 
-    //getter and Setters
-
-    //methods
     AddBookToBranch(book){
         let found = false;
 
@@ -110,12 +22,13 @@ class Branch{
 
     }
 
-    CheckBookOut(book){
+    CheckBookOut(book,user){
         this.BookInventory.forEach(books =>{
          if(books.Book.Title == book.Title){             
              if(books.BookCount>0)
              {
-             books.BookCount -=1;
+                this.CheckedOutBooks.push(new CheckOut(book, user));
+                books.BookCount -=1;             
             }
          }
         });
@@ -127,14 +40,203 @@ class Branch{
     }
 }
 
+class LibraryUser{
+    constructor(userName, userAddress){
+        this.Name = userName;
+        this.Address = userAddress;
+    }
+
+    CreateNewLibraryCard(){
+        this.CardId = Math.floor(Date.now() / 1000);
+    }
+}
+
+class CheckOut{
+    constructor(book, user){
+        this.Book = book;
+        this.User = user;
+    }
+}
+
+class Book{
+    constructor(title,authorInfo, genre, publisherInfo, isbn){
+        this.Title = title;
+        this.Author = authorInfo;
+        this.BookGenre = genre;
+        this.Publication = publisherInfo;
+        this.ISBN = isbn;
+    }
+
+    GetTitle(){
+        return this.Title;
+    }
+
+    SetTitle(bookTitle){
+        this.Title = bookTitle;
+    }
+
+    GetAuthor(){
+        return this.Author;
+    }
+
+    SetAuthor(newAuthor){
+        this.Author = newAuthor;
+    }
+
+    GetBookGenre(){
+        return this.BookGenre;
+    }
+
+    SetBookGenre(genre){
+        this.BookGenre = genre;
+    }
+
+    GetPublication(){
+        return this.Publication;
+    }
+
+    SetPublication(newPublication){
+        this.Publication = newPublication;
+    }
+
+    GetISBN(){
+        return this.ISBN;
+    }
+
+    SetISBN(newISBN){
+        this.ISBN = newISBN;
+    }
+}
+
+
+class Author{
+    constructor(name,bio){
+        this.Name = name;
+        this.Bio = bio;
+    }
+
+    GetName(){
+        return this.Name;
+    }
+
+    SetName(authorName){
+        this.Name = authorName;
+    }
+
+    GetBio(){
+        return this.Bio;
+    }
+
+    SetBio(details){
+        this.Bio = details;
+    }
+}
+
+
+class BranchInventory{
+    constructor(book){
+        this.Book = book;
+        this.BookCount = 1;
+    }
+}
+
+
+class Branch extends LibraryManagement{
+    constructor(name, location, hoursOfOperation){
+        super();
+        this.BranchName = name;
+        this.Location = location;
+        this.HoursOfOperation = hoursOfOperation;
+        //this.BookInventory = [];
+    }
+
+    //getter and Setters
+    GetBranchName(){
+        return this.BranchName;
+    }
+    SetBranchName(newName){
+        this.BranchName =newName;
+    }
+    
+    GetLocation(){
+        return this.Location;
+    }
+    SetLocation(newLocation){
+        this.Location =newLocation;
+    }
+
+    GetHoursOfOperation(){
+        return this.HoursOfOperation;
+    }
+    SetBranchName(newHours){
+        this.HoursOfOperation =newHours;
+    }
+
+    AddBookToLibrary(book){
+        this.AddBookToBranch(book);      
+    }
+
+    IsBookAvailableForCheckOut(book){
+        let found = false
+        this.BookInventory.forEach(bookInfo=> {
+            if( bookInfo.Book.Title == book.Title && bookInfo.BookCount>0)
+            {
+                found= true;               
+            }
+        });
+
+        return found;
+    }
+
+    //create a method that allows users to check out a book
+    CheckOutBookFromBranch(book,user){
+        if(this.IsBookAvailableForCheckOut(book))
+        {
+            this.CheckBookOut(book,user);
+            console.log(`You have checked out ${book.Title}.  This book is due back in 7 days!!  Thank you for using ${this.BranchName} library.  Happy Reading!`);
+            
+        }
+        else{
+            const notfoundMessage = `Sorry the book you requested, ${book.Title} , is not available.  
+            Please check back in 7 days for availability status.  
+            You may like these other book in that Genre. `;
+
+            let referenceBooks="";
+            this.BookInventory.forEach(element=> {
+                             if(element.Book.BookGenre.GenreType == book.BookGenre.GenreType && element.Book.Title != book.Title){ 
+                                referenceBooks = `${referenceBooks}, ${element.Book.Title}`;
+                             }
+                        });
+            
+            console.log(`${notfoundMessage} ${referenceBooks}`);
+            
+        }
+    }
+
+    UsersStatus(user){
+        this.CheckedOutBooks.forEach(element=>{
+            if(element.User == user){
+                console.log(`Hello ${user.Name}, you have the following book checked out: ${
+                    element.Book.Title
+                }`);
+                
+            }
+        });
+    }
+}
+
 
 class Genre{
     constructor(genre){
         this.GenreType = genre;
     }
 
-    getBookGenre(){
+    GetBookGenre(){
         return this.GenreType;
+    }
+
+    SetBookGenre(newGenre){
+        this.GenreType = newGenre;
     }
 }
 
@@ -146,92 +248,60 @@ class Publisher{
         this.Copyright = copyright;
     }
 
-    getPublishingCompany(){
+    GetPublishingCompany(){
         return this.PublishingCompany;
     }
 
-    setPublishingCompany(newCompany){
+    SetPublishingCompany(newCompany){
         this.PublishingCompany = newCompany;
     }
 
-    getPublishedDate(){
+    GetPublishedDate(){
         return this.PublishedDate;
     }
 
-    setPublishedDate(newDate){
+    SetPublishedDate(newDate){
         this.PublishedDate = newDate;
     }
 
-    getCopyright(){
+    GetCopyright(){
         return this.Copyright;
     }
 
-    setCopyright(newCopyright){
+    SetCopyright(newCopyright){
         this.Copyright = newCopyright;
     }
     
 }
 
-class LibraryManagement{  
-    AddBookToLibrary(book,branch){
-        branch.AddBookToBranch(book);      
-    }
-
-    IsBookAvailableForCheckOut(book,branch){
-        let found = false
-        branch.BookInventory.forEach(bookInfo=> {
-            if( bookInfo.Book.Title == book.Title && bookInfo.BookCount>0)
-            {
-                found= true;               
-            }
-        });
-
-        return found;
-    }
-
-    //create a method that allows users to check out a book
-    CheckOutBookFromBranch(book, branch){
-        if(this.IsBookAvailableForCheckOut(book,branch))
-        {
-            branch.CheckBookOut(book);
-            console.log(`You have checked out ${book.Title}.  This book is due back in 7 days!!  Thank you for using ${branch.BranchName} library.  Happy Reading!`);
-            
-        }
-        else{
-            const notfoundMessage = `Sorry the book you requested, ${book.Title} , is not available.  
-            Please check back in 7 days for availability status.  
-            You may like these other book in that Genre. `;
-
-            let referenceBooks="";
-            branch.BookInventory.forEach(element=> {
-                             if(element.Book.BookGenre.GenreType == book.BookGenre.GenreType && element.Book.Title != book.Title){ 
-                                referenceBooks = `${referenceBooks}, ${element.Book.Title}`;
-                             }
-                        });
-            
-            console.log(`${notfoundMessage} ${referenceBooks}`);
-            
-        }
-    }
-
-}
 
 
 //Test Run
 const eastBranches = new Branch("East Branch","123 Main St.","Sunday - Friday 8AM - 5 PM");
 const westBranches = new Branch("West Branch","123 AppleTree St.","Sunday - Friday 8AM - 4 PM");
+const user = new LibraryUser("John Doe", "111 Main st.");
+const user2 = new LibraryUser("Jane Doe", "111 Main st.");
+user.CreateNewLibraryCard();
+user2.CreateNewLibraryCard();
 
-const libraryTest = new LibraryManagement();
-libraryTest.AddBookToLibrary(new Book("Javascript: Definitive Guide", new Author("David Flanagan", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("O'Reilly Media","6/9/2020",""),1491952024),eastBranches);
-libraryTest.AddBookToLibrary(new Book("Professional Javascript for Web Developers", new Author("Nicholas C. Zakas", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("Wrox","10/15/2019",""),1119366445),westBranches);
-libraryTest.AddBookToLibrary(new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("No Starch Press","12/4/2018",""),1593279509),eastBranches);
-libraryTest.AddBookToLibrary(new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("No Starch Press","12/4/2018",""),1593279509),eastBranches);
-libraryTest.AddBookToLibrary(new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("No Starch Press","12/4/2018",""),1593279509),eastBranches);
-
-const bookToSearch =new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher());
-
-libraryTest.CheckOutBookFromBranch(bookToSearch,eastBranches);
-libraryTest.CheckOutBookFromBranch(bookToSearch,eastBranches);
-
+const bookToSearch =new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("No Starch Press","12/4/2018",""),1593279509);
+const book2ToSearch =new Book("Javascript: Definitive Guide", new Author("David Flanagan", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("O'Reilly Media","6/9/2020",""),1491952024);
+const book3ToSearch =new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("No Starch Press","12/4/2018",""),1593279509);
 
 const failedBookToSearch =new Book("DodgeBall Fundementals", new Author("Luke Broock", "Lorem Epsum"),new Genre("Gaming"),new Publisher("ESPN Media",'5/4/1998',''));
+
+
+eastBranches.AddBookToLibrary(new Book("Javascript: Definitive Guide", new Author("David Flanagan", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("O'Reilly Media","6/9/2020",""),1491952024));
+eastBranches.AddBookToLibrary(new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("No Starch Press","12/4/2018",""),1593279509));
+eastBranches.AddBookToLibrary(new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("No Starch Press","12/4/2018",""),1593279509));
+eastBranches.AddBookToLibrary(new Book("Eloquent Javascript", new Author("Marijn Haverbeke", "Lorem Epsum"),new Genre("Computer Programming"),new Publisher("No Starch Press","12/4/2018",""),1593279509));
+
+
+eastBranches.CheckOutBookFromBranch(bookToSearch,user);
+eastBranches.CheckOutBookFromBranch(book2ToSearch,user);
+eastBranches.CheckOutBookFromBranch(book3ToSearch,user2);
+
+eastBranches.CheckOutBookFromBranch(failedBookToSearch,user2);
+
+eastBranches.UsersStatus(user);
+eastBranches.UsersStatus(user2);
